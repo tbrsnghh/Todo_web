@@ -39,11 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'base.apps.BaseConfig',
     'bootstrap5',
+    'whitenoise.runserver_nostatic',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -127,9 +129,7 @@ LOGIN_URL = 'login'
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.dirname(BASE_DIR, 'static_project')
-]
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "static_root")
+STATICFILES_STOREAGE = 'whitenoise.storage.CompressStaaticFilesStorage'
+
 LOGIN_REDIRECT_URL = "tasks"
 LOGOUT_REDIRECT_URL = "tasks"  # new
