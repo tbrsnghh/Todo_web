@@ -27,7 +27,7 @@ SECRET_KEY = 'd)=^c7!0-oqjmqve%(bt+p#sq6x*ipz2keh741j*-@f@_)f!1t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Application definition
@@ -80,11 +80,7 @@ WSGI_APPLICATION = 'todo_list.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        # Replace this value with your local database's connection string.
-        default='postgres://tbrs_tt66_user:XWiTLOa1EDSwpqEu7JEXdUO23rRA5Fo8@dpg-cmmmqff109ks739a9a2g-a.singapore-postgres.render.com/tbrs_tt66',
-        conn_max_age=600
-    )
+    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
 
 
