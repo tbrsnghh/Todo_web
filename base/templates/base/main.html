@@ -17,15 +17,17 @@
     <!-- hic -.- chán ghe  -->
     {% load bootstrap5 %}
     {% bootstrap_css %}
+    {% bootstrap_javascript%}
        
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
-
-    <div class="containerr">
-        {% block content %} {% endblock content %}
-    </div>
+    
+        {% block content %} 
+        {% endblock content %}
+    
+    
 </body>
 
 

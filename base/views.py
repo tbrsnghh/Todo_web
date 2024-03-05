@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
+from django.template import loader
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,7 +16,7 @@ from django.views import View
 from django.shortcuts import redirect
 from django.db import transaction
 
-from .models import Task
+from .models import Note, Task
 from .forms import PositionForm
 
 
@@ -44,8 +46,10 @@ class RegisterPage(FormView):
             return redirect('tasks')
         return super(RegisterPage, self).get(*args, **kwargs)
 
+    
 
-class TaskList(LoginRequiredMixin, ListView):
+# Hiển thị task, notes và podomoro
+class TaskList(LoginRequiredMixin, ListView): 
     model = Task
     context_object_name = 'tasks'
 
@@ -53,6 +57,7 @@ class TaskList(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['tasks'] = context['tasks'].filter(user=self.request.user)
         context['count'] = context['tasks'].filter(complete=False).count()
+        context['notes'] = Note.objects.all()
 
         search_input = self.request.GET.get('search-area') or ''
         if search_input:
@@ -60,7 +65,6 @@ class TaskList(LoginRequiredMixin, ListView):
                 title__contains=search_input)
 
         context['search_input'] = search_input
-
         return context
 
 
@@ -79,11 +83,11 @@ class TaskCreate(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super(TaskCreate, self).form_valid(form)
 
-
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
     fields = ['title', 'description', 'complete']
     success_url = reverse_lazy('tasks')
+
 
 
 class DeleteView(LoginRequiredMixin, DeleteView):
@@ -105,3 +109,37 @@ class TaskReorder(View):
                 self.request.user.set_task_order(positionList)
 
         return redirect(reverse_lazy('tasks'))
+
+def check_complete_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+
+    # Update the task's completion status
+    task.complete = not task.complete  # Toggle completion
+    task.save()
+
+    # Redirect to the task list page
+    return redirect('tasks')
+
+# Note app
+class NoteDetail(LoginRequiredMixin, DetailView):
+    model = Note
+    context_object_name = 'note'
+    template_name = 'base/note.html'
+class NoteCreate(LoginRequiredMixin, CreateView):
+    model = Note
+    fields = ['titlenote', 'body']
+    success_url = reverse_lazy('tasks')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(NoteCreate, self).form_valid(form)
+
+class NoteUpdate(LoginRequiredMixin, UpdateView):
+    model = Note
+    fields = ['titlenote', 'body']
+    success_url = reverse_lazy('tasks')
+def delete_note(request, pk):
+  note = Note.objects.get(pk=pk)
+  note.delete()
+  return redirect(reverse('tasks'))
+

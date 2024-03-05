@@ -1,9 +1,11 @@
 {% extends 'base/main.html' %} {% block content %}
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+<!-- header -->
 <div class="header-bar">
     <div>
-        <h1>Hello {{request.user|title}}</h1>
+        <h1><a href="{% url 'tasks' %}">Hello {{request.user|title}}</a></h1>
         <p style="margin:0">You have <i>{{count}}</i> incomplete task{{ count|pluralize:"s" }}</p>
     </div>
 
@@ -11,52 +13,99 @@
     <form action="{% url 'logout' %}" method="post">
         {% csrf_token %}
         <button type="submit" class="btn me-2 mt-2 btn-light">Log Out</button>
-    </form> 
+    </form>
     {% else %}
     <a href="{% url 'login' %}">Login</a> {% endif %}
 </div>
 
-
-<div id="search-add-wrapper">
-    <form method="GET" style="display: flex;">
-        <input class="form-control me-2 mt-2" type='text' name='search-area' placeholder="Search your task" value="{{search_input}}">
-        <input class="btn me-2 mt-2 btn-light" type="submit" value='Search'>
-    </form>
-    {% if tasks|length > 0 %}
-    <a id="add-link" href="{% url 'task-create' %}">&#x2b;</a>
-    {% endif %}
-</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6">
 
 
-<!-- Hidden form. Form submits new item positions -->
-<form style="display: none;" id="reorderForm" method="post" action="{% url 'task-reorder' %}">
-    {% csrf_token %}
-    <input type="hidden" id="positionInput" name="position">
-</form>
+            <!-- Tìm kiếm -->
+            <div id="search-add-wrapper">
+                <form method="GET" style="display: flex;">
+                    <input class="form-control me-2 mt-2" type='text' name='search-area' placeholder="Search your task"
+                        value="{{search_input}}">
+                    <input class="btn me-2 mt-2 btn-light" type="submit" value='Search'>
+                </form>
+                {% if tasks|length > 0 %}
+                <a id="add-link" href="{% url 'task-create' %}">&#x2b;</a>
+                {% endif %}
+            </div>
 
 
-<div id="tasklist" class="task-items-wrapper">
-    {% for task in tasks %}
-    <div class="task-wrapper" data-position="{{task.pk}}">
-        <div class="task-title">
-            {% if task.complete %}
-            <div class="task-complete-icon"></div>
-            <i><s><a href="{% url 'task-update' task.id %}">{{task}}</a></s></i> {% else %}
-            <div class="task-incomplete-icon"></div>
-            <a href="{% url 'task-update' task.id %}">{{task}}</a> {% endif %}
+            <!-- Hidden form. Form submits new item positions -->
+            <form style="display: none;" id="reorderForm" method="post" action="{% url 'task-reorder' %}">
+                {% csrf_token %}
+                <input type="hidden" id="positionInput" name="position">
+            </form>
+
+
+            <div id="tasklist" class="task-items-wrapper">
+                {% for task in tasks %}
+                <div class="task-wrapper" data-position="{{task.pk}}">
+                    <div class="task-title">
+                        {% if task.complete %}
+                        
+                        <a href="{% url 'check_complete_task' task.id %}">
+                            <div class="task-complete-icon"></div>
+                        </a>
+                        
+                        <i><s><a href="{% url 'task-update' task.id %}">{{task}}</a></s></i>
+                        {% else %}
+                        <a href="{% url 'check_complete_task' task.id %}">
+                            <div class="task-incomplete-icon"></div>
+                        </a>
+                        <a href="{% url 'task-update' task.id %}">{{task}}</a>
+                        {% endif %}
+                    </div>
+                    <div class="task-controls">
+                        <a class="delete-link" href="{% url 'task-delete' task.id %}">&#215;</a>
+                        <span class="handle">&nbsp;&#10247;</span>
+                    </div>
+                </div>
+
+                {% empty %}
+                <div class="container-fluid md mt-3" style="padding-bottom: 10px; line-height: 1em;">
+                    <h5>No new tasks are created.</h5>
+                    <h5>Create a <a style="text-decoration: none; color: #e53935;" href="{% url 'task-create' %}">New
+                            task</a> ! </h5>
+                </div>
+                {% endfor %}
+
+
+            </div>
         </div>
-        <div class="task-controls">
-            <a class="delete-link" href="{% url 'task-delete' task.id %}">&#215;</a>
-            <span class="handle">&nbsp;&#10247;</span>
+        <!-- Note app -->
+        <div class="col-lg-6">
+            <h1 class="pt-4 me-2">My Notes</h1>
+
+            <a id="add-link" href="{% url 'note-create' %}">
+                <button type="submit" href="{% url 'note-create' %}" class="btn me-2 mt-2 btn-light new_note">New note</button>
+            </a>
+            
+
+            {% for note in notes %}
+            <div class="container-fluid mt-3" data-position="{{note.pk}}">
+                <div class="card task-title">
+                    <div>
+                        <a href="{% url 'note-update' note.id %}">
+                            <h4>{{note.titlenote}}</h4>
+                        </a><br>
+                    </div>
+                    <div class="card-text p-4">
+                        <p> {{note.body}}</p>
+                        <a href="{% url 'delete_note' note.id %}">
+                            <button>Delete</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
-
-    {% empty %}
-    <div class="container-fluid md mt-3" style="padding-bottom: 10px; line-height: 1em;">
-        <h5>No new tasks are created.</h5>
-        <h5>Create a <a style="text-decoration: none; color: #e53935;" href="{% url 'task-create' %}">New task</a> ! </h5>
-    </div>
-    {% endfor %}
 </div>
 
 <script>

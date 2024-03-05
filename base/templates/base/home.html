@@ -1,0 +1,20 @@
+{% extends 'base/main.html' %}
+{% block content %}
+<h1>Danh sách tasks và notes</h1>
+<h2>Tasks</h2>
+<ul>
+    {% for task in tasks %}
+        <li>{{ task.title }}</li>
+    {% endfor %}
+</ul>
+<h2>Notes</h2>
+<ul>
+    {% for note in notes %}
+        <li>{{ note.body }}</li>
+    {% endfor %}
+</ul>2
+
+
+
+
+{% endblock content %}

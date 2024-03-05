@@ -1,0 +1,12 @@
+{% extends 'base/main.html' %}
+{% block content %}
+
+<h1>Xóa ghi chú</h1>
+<p>Bạn có chắc chắn muốn xóa ghi chú này?</p>
+<form action="{% url 'delete_note' note.pk %}" method="post">
+  {% csrf_token %}
+  <button type="submit">Xóa</button>
+  <a href="{% url 'tasks' %}">Hủy</a>
+</form>
+
+{% endblock content %}

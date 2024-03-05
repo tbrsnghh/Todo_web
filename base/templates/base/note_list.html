@@ -1,0 +1,69 @@
+{% extends 'base/main.html' %} {% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<!-- header -->
+<div class="header-bar">
+    <div>
+        <h1><a href="{% url 'tasks' %}">Hello {{request.user|title}}</a></h1>
+        <p style="margin:0">You have <i>{{count}}</i> incomplete task{{ count|pluralize:"s" }}</p>
+    </div>
+
+    {% if request.user.is_authenticated %}
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn me-2 mt-2 btn-light">Log Out</button>
+    </form> 
+    {% else %}
+    <a href="{% url 'login' %}">Login</a> {% endif %}
+</div>
+
+<!-- Tìm kiếm -->
+
+
+
+<!-- Hidden form. Form submits new item positions -->
+
+<h1>Danh sách tasks và notes</h1>
+<h2>Tasks</h2>
+<ul>
+    {% for task in tasks %}
+        <li>{{ task.title }}</li>
+    {% endfor %}
+</ul>
+<h2>Notes</h2>
+<ul>
+    {% for note in notes %}
+        <li>{{ note.body }}</li>
+    {% endfor %}
+</ul>
+
+
+
+
+<script>
+    var taskList = document.getElementById("tasklist");
+    var reorderForm = document.getElementById("reorderForm");
+    var positionInput = document.getElementById("positionInput");
+
+    let sortable = Sortable.create(taskList, {
+        handle: '.handle',
+        ghostClass: 'dropArea',
+        chosenClass: 'selectedTask',
+
+    });
+
+    function reordering() {
+        const rows = document.getElementsByClassName("task-wrapper");
+        let pos = [];
+        for (let row of rows) {
+            pos.push(row.dataset.position);
+        }
+        console.log(pos.join(","))
+        positionInput.value = pos.join(',');
+        reorderForm.submit();
+    }
+
+    document.ondrop = reordering
+</script>
+
+{% endblock content %}

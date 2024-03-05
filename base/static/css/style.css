@@ -1,9 +1,7 @@
 body {
     background-color: #FAFAFA;
     font-family: 'Nunito', sans-serif;
-    padding-top: 50px;
 }
-
 h1,
 h2,
 h3,
@@ -164,7 +162,7 @@ label {
     opacity: 0.5;
 }
 
-.button {
+.button, .btn {
     border: 1px solid #757575;
     background-color: #FFF;
     color: #A5DD9B;
